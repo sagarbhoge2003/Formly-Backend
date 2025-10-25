@@ -1,25 +1,30 @@
+from pydantic_settings import BaseSettings
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
-
-class Settings:
+class Settings(BaseSettings):
     PROJECT_NAME: str = "FastAPI Backend"
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:ultron@localhost:5432/formly_main")
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "supersecret")
+    DATABASE_URL: str
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    POSTGRES_USER: str ="sagar"
-    POSTGRES_PASSWORD: str="ultron"
-    POSTGRES_DB: str="formly_main"
-    POSTGRES_HOST: str = "localhost"
+
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+    POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432
 
     class Config:
         env_file = ".env"
+        env_file_encoding = "utf-8"
+
+    @property
+    def db_dsn(self) -> str:
+        """Construct DATABASE_URL if not directly set."""
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
+        return (
+            f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        )
 
 settings = Settings()
-
-DATABASE_URL = (
-    f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}"
-    f"@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
-)
