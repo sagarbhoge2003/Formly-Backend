@@ -8,10 +8,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from .logger import _request_id_ctx_var, logger
 
-
-# -----------------------------
-# Logging Middleware
-# -----------------------------
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         start_time = time.time()
